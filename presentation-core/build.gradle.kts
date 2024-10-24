@@ -12,7 +12,7 @@ plugins {
 dependencies {
     api(libs.spring.boot.starter)
     api(projects.domain)
-    api(projects.infra) {
+    api(projects.infraJooq) {
         dependencies {
             api(libs.bundles.jooq)
         }

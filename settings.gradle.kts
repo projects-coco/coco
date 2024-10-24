@@ -5,11 +5,11 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "coco"
 include(
-    "presentation",
     "presentation-core",
+    "presentation-webflux",
     "presentation-batch",
     "domain",
-    "infra",
+    "infra-jooq",
     "infra-webclient",
     "infra-redis",
 )
