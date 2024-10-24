@@ -1,0 +1,11 @@
+test:
+  db:
+    username: test-user
+    password: test-password
+    schema: sample
+    cmd-name: test-mariadb-container
+    engine: mariadb
+    endpoint: localhost
+    flyway-sql-location: migrations/coco
+    flyway-schema-history: flyway_schema_history
+
