@@ -11,7 +11,7 @@ Examples (Kotlin Code)
 project start
 ----------------------
 
-you can use COCO by @CocoWebApplication
+You can use COCO by @CocoWebApplication
 
 ```kotlin
 @CocoWebApplication
@@ -39,7 +39,7 @@ annotation class CocoWebApplication()
 
 Webflux handler
 ----------------------
-you can handle Effect (which is data structure of [Arrow(FP Library)](https://arrow-kt.io/)) by using 'handle'
+You can handle Effect (which is data structure of [Arrow(FP Library)](https://arrow-kt.io/)) by using 'handle'
 
 ```kotlin
 suspend fun <A> handle(
@@ -50,7 +50,7 @@ suspend fun <A> handle(
 }
 ```
 
-handler example
+Handler example
 
 ```kotlin
 @PostMapping("/login")
@@ -101,7 +101,7 @@ test:
 [Redis](https://redis.io/)
 ----------------------
 
-you can use redis by @Import(RedisConfig::class)
+You can use redis by @Import(RedisConfig::class)
 
 ```kotlin
 @CocoWebApplication
@@ -116,9 +116,9 @@ app:
     port: ${REDIS_PORT:6379}
 ```
 
-you have to do is implements SimpleRedisRepositoryBase
+You have to do is implements SimpleRedisRepositoryBase
 
-you can customize 'READ' method (e.g retrieveByKey)
+You can customize 'READ' method (e.g retrieveByKey)
 
 ```kotlin
 class RedisRepositoryImpl(private val redissonReactiveClient: RedissonReactiveClient) :
@@ -136,7 +136,7 @@ class RedisRepositoryImpl(private val redissonReactiveClient: RedissonReactiveCl
 [Spring Batch](https://spring.io/projects/spring-batch)
 ----------------------
 
-you can use SpringBatch by @CocoBatchApplication
+You can use SpringBatch by @CocoBatchApplication
 
 ```kotlin
 @CocoBatchApplication
@@ -179,4 +179,110 @@ class BatchExample {
             .withSchedule(intervalNMinutesSchedule(1))
             .build()
 }
+```
+
+[Spring WebClient](https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html)
+----------------------
+
+You can use Spring WebClient by ApiUtils
+
+```kotlin
+ApiUtils()
+    .post(API_ENDPOINT)
+    .headers(mapOf("Authorization" to authToken))
+    .body(mapOf("grant_type" to "account_credentials"))
+    .contentType(MediaType.FormUrlEncode)
+    .call(Response::class)
+```
+
+[jOOQ](https://www.jooq.org/)
+----------------------
+
+You can use jOOQ by implementing SimpleCrudRepositoryBase.
+
+Implementing SimpleCrudRepositoryBase allows you to use CRUD methods.
+
+```kotlin
+abstract class SimpleCrudRepositoryBase<Id : EntityId<*>, Entity : EntityBase<Id>, R : Record>(
+    protected val table: Table<R>,
+    protected val toJooq: Entity.() -> R,
+    protected val toDomain: R.() -> Entity,
+    private val keyColumn: String = "id",
+) : JooqRepositoryBase(), Repository<Id, Entity>
+
+---
+
+UserRepository : SimpleCrudRepositoryBase<User.Id, User, UserRecord>
+
+---
+
+UserRepository().save(user)
+UserRepository().retrieve(user.id)
+UserRepository().delete(user)
+```
+
+You can use 'dynamic query' by implementing SearchRepositoryBase
+
+```kotlin
+abstract class SearchRepositoryBase<Id : EntityId<*>, Entity : EntityBase<Id>, R : Record, S : SearchDtoBase>(
+    table: Table<R>,
+    toJooq: Entity.() -> R,
+    toDomain: R.() -> Entity,
+    val selectConditionBuilder: suspend S.() -> Condition,
+) : SearchRepository<Entity, S>, SimpleCrudRepositoryBase<Id, Entity, R>(table, toJooq, toDomain)
+
+---
+
+UserRepository : SearchRepositoryBase<User.Id, User, UserRecord, UserSearchDto>
+
+---
+
+UserRepository().search(
+    UserSearchDto(
+        username = "username",
+        name = "name",
+        email = "email",
+    )
+)
+```
+
+Event Notification Bus
+----------------------
+
+You can use EventNotificationBus, which enables the transfer of event between **different modules**.
+
+```kotlin
+class A {
+    fun emitEvent() {
+        EventNotificationBus().emitNotification(MyCustomEvent())
+    }
+}
+
+---
+
+class B {
+    fun handleEvent() {
+        EventNotificationBus()
+            .notifications()
+            .handleEvent<MyCustomEvent> { event -> customLogic(event) }
+            .subscribe()
+    }
+}
+
+```
+
+Pagination
+----------------------
+
+You can use pagination by only using 'PageRequest' in your Controller
+
+```kotlin
+    @GetMapping()
+suspend fun page(
+    @RequestBody request: Request,
+    page: PageRequest,
+) {
+    ...
+}
+
 ```
