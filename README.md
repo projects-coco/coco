@@ -3,8 +3,6 @@ COCO
 
 COCO is designed to facilitate the use of Spring WebFlux, Batch, WebClient, Redis, Flyway, TestContainer and jOOQ.
 
-Additional modules for other frameworks(e.g., Spring MVC, JPA, Prometheus) are planned for future release.
-
 Examples (Kotlin Code)
 ========
 
