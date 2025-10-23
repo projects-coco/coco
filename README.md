@@ -1,7 +1,7 @@
 COCO
 ====
 
-COCO is designed to facilitate the use of Spring WebFlux, Batch, WebClient, Redis, Flyway, TestContainer and jOOQ.
+COCO is designed to facilitate the use of Spring WebFlux, WebClient, Redis, Flyway, TestContainer and jOOQ.
 
 Examples (Kotlin Code)
 ========
@@ -128,54 +128,6 @@ class RedisRepositoryImpl(private val redissonReactiveClient: RedissonReactiveCl
     override fun save(entity: Entity): Effect<Nothing, Entity> {}
 
     fun retrieveByKey(key: Key): Effect<NotFound, Entity> {}
-}
-```
-
-[Spring Batch](https://spring.io/projects/spring-batch)
-----------------------
-
-You can use SpringBatch by @CocoBatchApplication
-
-```kotlin
-@CocoBatchApplication
-class Application
-```
-
-With COCO, you have to do is only writing batch logic.  
-COCO provides simple function for batch tasks such as 'intervalNMinutesSchedule(N)'(running batches every N minute) so
-that you can use batch easily.
-
-```kotlin
-@Configuration
-class BatchExample {
-    @Component
-    class Job(
-        private val cocoCoroutineScopeProvider: CocoCoroutineScopeProvider,
-        private val batchService: BatchService,
-    ) : org.quartz.Job {
-        override fun execute(jobExecutionContext: JobExecutionContext?) {
-            cocoCoroutineScopeProvider.provide().launch {
-                batchService.batch().bindOrNothing()
-            }
-        }
-    }
-
-    @Bean
-    fun batchJobDetail(): JobDetail =
-        JobBuilder
-            .newJob(Job::class.java)
-            .withIdentity(Job::class.qualifiedName)
-            .storeDurably()
-            .build()
-
-    @Bean
-    fun batchJobTrigger(): Trigger =
-        TriggerBuilder
-            .newTrigger()
-            .forJob(Job::class.qualifiedName)
-            .startNow()
-            .withSchedule(intervalNMinutesSchedule(1))
-            .build()
 }
 ```
 
